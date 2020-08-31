@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
-public interface TopicDao extends MongoRepository<Topic, Integer> {
+public interface TopicDao extends MongoRepository<Topic, String> {
     
     List<Topic> findAllByName(String name);
     

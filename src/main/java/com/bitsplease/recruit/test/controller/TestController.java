@@ -32,17 +32,17 @@ public class TestController {
     }*/
     
     @Autowired
-    private TopicDao topicDao;
+    private TopicDao     topicDao;
     @Autowired
     private TopicService topicService;
-
+    
     @GetMapping("/")
     public List<Topic> helloWorld() {
         return topicDao.findAll();
     }
     
     @GetMapping("/{id}")
-    public Optional<Topic> getTopic(@PathVariable int id) throws Exception {
+    public Optional<Topic> getTopic(@PathVariable String id) throws Exception {
         return topicDao.findById(id);
     }
     
@@ -51,6 +51,18 @@ public class TestController {
         ModelMapper modelMapper = new ModelMapper();
         Topic topic = modelMapper.map(topicDto, Topic.class);
         topicDao.save(topic);
+        return modelMapper.map(topic, TopicDto.class);
+    }
+    
+    @PutMapping("/")
+    public TopicDto updateTopic(@RequestBody TopicDto topicDto) {
+        ModelMapper modelMapper = new ModelMapper();
+        //        Topic topic = modelMapper.map(topicDto, Topic.class);
+        Optional<Topic> topic = topicDao.findById(topicDto.getId());
+        //        if (topic != null) {
+        modelMapper.map(topicDto, topic.get());
+        topicDao.save(topic.get());
+        //        }
         return modelMapper.map(topic, TopicDto.class);
     }
     
@@ -76,7 +88,6 @@ public class TestController {
         topicDto.setContent(topic.getContent());
         return topicDto;
     }
-    
     
     @GetMapping("/name/{name}/{content}")
     public List<TopicDto> getByName(@PathVariable String name, @PathVariable String content) {
