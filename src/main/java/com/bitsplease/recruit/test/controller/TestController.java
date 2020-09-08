@@ -1,11 +1,15 @@
 package com.bitsplease.recruit.test.controller;
 
+import com.bitsplease.recruit.exception.RecruitNowException;
 import com.bitsplease.recruit.test.dao.TopicDao;
 import com.bitsplease.recruit.test.dto.TopicDto;
 import com.bitsplease.recruit.test.model.Topic;
 import com.bitsplease.recruit.test.service.TopicService;
+import com.bitsplease.recruit.utils.ConverterUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,32 +41,40 @@ public class TestController {
     private TopicService topicService;
     
     @GetMapping("/")
-    public List<Topic> helloWorld() {
-        return topicDao.findAll();
+    public ResponseEntity<List<Topic>> helloWorld() {
+        new ResponseEntity<List<Topic>>(topicDao.findAll(), HttpStatus.OK);
+        throw new RecruitNowException(HttpStatus.BAD_REQUEST.value(), "My error");
     }
     
     @GetMapping("/{id}")
-    public Optional<Topic> getTopic(@PathVariable String id) throws Exception {
-        return topicDao.findById(id);
+    public ResponseEntity<Optional<Topic>> getTopic(@PathVariable String id) throws Exception {
+        Optional<Topic> op =topicDao.findById(id);
+        if(!op.isPresent()) {
+            throw new Exception();
+        }
+        op.ifPresent(x -> System.out.println(x));
+        return new ResponseEntity<Optional<Topic>>(topicDao.findById(id), HttpStatus.OK);
     }
+    
+    @Autowired
+    private ConverterUtils converterUtils;
     
     @PostMapping("/")
     public TopicDto createTopic(@RequestBody TopicDto topicDto) {
         ModelMapper modelMapper = new ModelMapper();
         Topic topic = modelMapper.map(topicDto, Topic.class);
         topicDao.save(topic);
+        //        TopicDto topicDto1 = converterUtils.
+        
         return modelMapper.map(topic, TopicDto.class);
     }
     
     @PutMapping("/")
     public TopicDto updateTopic(@RequestBody TopicDto topicDto) {
         ModelMapper modelMapper = new ModelMapper();
-        //        Topic topic = modelMapper.map(topicDto, Topic.class);
         Optional<Topic> topic = topicDao.findById(topicDto.getId());
-        //        if (topic != null) {
         modelMapper.map(topicDto, topic.get());
         topicDao.save(topic.get());
-        //        }
         return modelMapper.map(topic, TopicDto.class);
     }
     

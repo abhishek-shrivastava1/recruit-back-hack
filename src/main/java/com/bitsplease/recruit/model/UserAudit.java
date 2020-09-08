@@ -9,9 +9,9 @@ import org.springframework.data.annotation.LastModifiedBy;
 @Setter
 public class UserAudit extends TimeAudit {
 
-//    @CreatedBy
-//    private User createdBy;
-//
-//    @LastModifiedBy
-//    private User updatedBy;
+    @CreatedBy
+    private String createdBy;
+
+    @LastModifiedBy
+    private String updatedBy;
 }
